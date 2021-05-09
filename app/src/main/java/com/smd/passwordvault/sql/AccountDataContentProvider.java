@@ -1,20 +1,28 @@
-// AddressBookContentProvider.java
+// AccountDataContentProvider.java
 // ContentProvider subclass for manipulating the app's database
 package com.smd.passwordvault.sql;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.util.Log;
 
 import com.smd.passwordvault.R;
+import com.smd.passwordvault.helpers.Constants;
 
 public class AccountDataContentProvider extends ContentProvider {
    // used to access the database
    private DatabaseHelper dbHelper;
+
+   private SharedPreferences sharedpreferences;
+
+   private static final String TAG = "AccntDtContentProvider";
 
    // UriMatcher helps ContentProvider determine operation to perform
    private static final UriMatcher uriMatcher =
@@ -35,11 +43,12 @@ public class AccountDataContentProvider extends ContentProvider {
          DatabaseDescription.AccountData.TABLE_NAME, ACCOUNTS);
    }
 
-   // called when the AddressBookContentProvider is created
+   // called when the AccountDataContentProvider is created
    @Override
    public boolean onCreate() {
       // create the AddressBookDatabaseHelper
       dbHelper = new DatabaseHelper(getContext());
+      sharedpreferences = getContext().getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
       return true; // ContentProvider successfully created
    }
 
@@ -54,7 +63,7 @@ public class AccountDataContentProvider extends ContentProvider {
    public Cursor query(Uri uri, String[] projection,
       String selection, String[] selectionArgs, String sortOrder) {
 
-      // create SQLiteQueryBuilder for querying contacts table
+      // create SQLiteQueryBuilder for querying accounts table
       SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
       queryBuilder.setTables(DatabaseDescription.AccountData.TABLE_NAME);
 
@@ -64,6 +73,11 @@ public class AccountDataContentProvider extends ContentProvider {
                DatabaseDescription.AccountData.COLUMN_ACCOUNT_ID + "=" + uri.getLastPathSegment());
             break;
          case ACCOUNTS: // all accounts will be selected
+            // filter accounts for the current user
+            int loggedInUserIdFromSession = sharedpreferences.getInt(Constants.USER_ID_KEY, 0);
+            Log.v(TAG, "********* query - loggedInUserIdFromSession:" + loggedInUserIdFromSession);
+            queryBuilder.appendWhere(
+                    DatabaseDescription.AccountData.COLUMN_USER_ID + "=" + loggedInUserIdFromSession);
             break;
          default:
             throw new UnsupportedOperationException(
@@ -82,7 +96,12 @@ public class AccountDataContentProvider extends ContentProvider {
    // insert a new account in the database
    @Override
    public Uri insert(Uri uri, ContentValues values) {
-      Uri newContactUri = null;
+      Uri newAccountUri = null;
+
+      int loggedInUserIdFromSession = sharedpreferences.getInt(Constants.USER_ID_KEY, 0);
+      Log.v(TAG, "********* insert - loggedInUserIdFromSession:" + loggedInUserIdFromSession);
+      values.put(DatabaseDescription.AccountData.COLUMN_USER_ID, loggedInUserIdFromSession);
+      Log.v(TAG, "Inserting an AccountData entry with user id");
 
       switch (uriMatcher.match(uri)) {
          case ACCOUNTS:
@@ -93,7 +112,7 @@ public class AccountDataContentProvider extends ContentProvider {
             // if the account was inserted, create an appropriate Uri;
             // otherwise, throw an exception
             if (rowId > 0) { // SQLite row IDs start at 1
-               newContactUri = DatabaseDescription.AccountData.buildContactUri(rowId);
+               newAccountUri = DatabaseDescription.AccountData.buildAccountUri(rowId);
 
                // notify observers that the database changed
                getContext().getContentResolver().notifyChange(uri, null);
@@ -107,7 +126,7 @@ public class AccountDataContentProvider extends ContentProvider {
                getContext().getString(R.string.invalid_insert_uri) + uri);
       }
 
-      return newContactUri;
+      return newAccountUri;
    }
 
    // update an existing account in the database

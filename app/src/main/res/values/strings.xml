@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Password Vault App</string>
+    <string name="app_name">Password Vault</string>
     <string name="text_accounts">All Accounts</string>
     <string name="hint_name">Name</string>
     <string name="hint_email">Email</string>
@@ -24,6 +24,8 @@
 
     <string name="menuitem_edit">Edit</string>
     <string name="menuitem_delete">Delete</string>
+    <string name="menuitem_logout">Logout</string>
+
     <string name="hint_name_required">Account Name (Required)</string>
 
     <string name="label_name">Account Name:</string>

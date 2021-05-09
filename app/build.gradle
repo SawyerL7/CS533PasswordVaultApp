@@ -5,7 +5,7 @@ android {
     buildToolsVersion '24.0.1'
 
     defaultConfig {
-        applicationId "com.deitel.addressbook"
+        applicationId "com.smd.passwordvault"
         minSdkVersion 23
         targetSdkVersion 23
         versionCode 1

@@ -5,17 +5,22 @@ package com.smd.passwordvault.fragments;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.LightingColorFilter;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 class ItemDivider extends RecyclerView.ItemDecoration {
    private final Drawable divider;
+   private final ColorFilter colorFilter = new LightingColorFilter( Color.YELLOW, Color.YELLOW);
 
    // constructor loads built-in Android list item divider
    public ItemDivider(Context context) {
       int[] attrs = {android.R.attr.listDivider};
       divider = context.obtainStyledAttributes(attrs).getDrawable(0);
+      divider.setColorFilter(colorFilter);
    }
 
    // draws the list item dividers onto the RecyclerView
@@ -39,6 +44,7 @@ class ItemDivider extends RecyclerView.ItemDecoration {
 
          // draw the divider with the calculated bounds
          divider.setBounds(left, top, right, bottom);
+
          divider.draw(c);
       }
    }

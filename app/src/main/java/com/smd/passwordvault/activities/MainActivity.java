@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 
 import com.smd.passwordvault.R;
 import com.smd.passwordvault.fragments.AccountsFragment;
@@ -16,6 +17,8 @@ public class MainActivity extends AppCompatActivity
         implements AccountsFragment.AccountsFragmentListener,
         DetailFragment.DetailFragmentListener,
         AddEditFragment.AddEditFragmentListener {
+
+    private static final String TAG = "MainActivity";
 
     // key for storing a account's Uri in a Bundle passed to a fragment
     public static final String ACCOUNT_URI = "account_uri";
@@ -29,6 +32,12 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setLogo(R.drawable.ic_lock_black_24dp);
+        getSupportActionBar().setDisplayUseLogoEnabled(true);
+
+        Log.v(TAG, "^^^^^^^ 1");
+        String emailFromIntent = getIntent().getStringExtra("EMAIL");
+        Log.v(TAG, "^^^^^^^ emailFromIntent:" + emailFromIntent);
 
         // if layout contains fragmentContainer, the phone layout is in use;
         // create and display a AccountsFragment
@@ -44,6 +53,16 @@ public class MainActivity extends AppCompatActivity
             transaction.commit(); // display AccountsFragment
         }
         else {
+            if(savedInstanceState != null){
+                Log.v(TAG,"----------------------- 1 NOT NULL");
+                String email = (String) savedInstanceState.get("EMAIL") ;
+
+                Log.v(TAG,"----------------------- email:" + email);
+            }
+            else {
+                Log.v(TAG,"----------------------- 1 NULL");
+            }
+
             accountsFragment =
                     (AccountsFragment) getSupportFragmentManager().
                             findFragmentById(R.id.accountsFragment);

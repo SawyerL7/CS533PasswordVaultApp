@@ -94,7 +94,7 @@ public class AddEditFragment extends Fragment
       // set FloatingActionButton's event listener
       saveAccountFAB = (FloatingActionButton) view.findViewById(
          R.id.saveFloatingActionButton);
-      saveAccountFAB.setOnClickListener(saveRecipeButtonClicked);
+      saveAccountFAB.setOnClickListener(saveAccountButtonClicked);
       updateSaveButtonFAB();
 
       // used to display SnackBars with brief messages
@@ -146,7 +146,7 @@ public class AddEditFragment extends Fragment
    }
 
    // responds to event generated when user saves a account
-   private final View.OnClickListener saveRecipeButtonClicked =
+   private final View.OnClickListener saveAccountButtonClicked =
       new View.OnClickListener() {
          @Override
          public void onClick(View v) {
@@ -154,12 +154,12 @@ public class AddEditFragment extends Fragment
             ((InputMethodManager) getActivity().getSystemService(
                Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(
                getView().getWindowToken(), 0);
-            saveRecipe(); // save recipe to the database
+            saveAccount(); // save recipe to the database
          }
       };
 
    // saves account information to the database
-   private void saveRecipe() {
+   private void saveAccount() {
       // create ContentValues object containing account's key-value pairs
       ContentValues contentValues = new ContentValues();
       contentValues.put(DatabaseDescription.AccountData.COLUMN_NAME,
@@ -185,7 +185,7 @@ public class AddEditFragment extends Fragment
       }
       else {
          // use Activity's ContentResolver to invoke
-         // insert on the AddressBookContentProvider
+         // insert on the AccountDataContentProvider
          int updatedRows = getActivity().getContentResolver().update(
             accountUri, contentValues, null, null);
 

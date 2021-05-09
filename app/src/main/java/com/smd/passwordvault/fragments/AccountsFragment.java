@@ -3,6 +3,8 @@
 package com.smd.passwordvault.fragments;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,10 +16,15 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.smd.passwordvault.R;
+import com.smd.passwordvault.activities.LoginActivity;
+import com.smd.passwordvault.helpers.Constants;
 import com.smd.passwordvault.sql.AccountsAdapter;
 import com.smd.passwordvault.sql.DatabaseDescription;
 
@@ -33,6 +40,7 @@ public class AccountsFragment extends Fragment
       void onAddAccount();
    }
 
+   private SharedPreferences sharedpreferences;
    private static final int ACCOUNTS_LOADER = 0; // identifies Loader
 
    // used to inform the MainActivity when a contact is selected
@@ -47,6 +55,9 @@ public class AccountsFragment extends Fragment
       Bundle savedInstanceState) {
       super.onCreateView(inflater, container, savedInstanceState);
       setHasOptionsMenu(true); // fragment has menu items to display
+
+      // getting the data which is stored in shared preferences.
+      sharedpreferences = getContext().getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
 
       // inflate GUI and get reference to the RecyclerView
       View view = inflater.inflate(
@@ -146,6 +157,34 @@ public class AccountsFragment extends Fragment
    public void onLoaderReset(Loader<Cursor> loader) {
       accountsAdapter.swapCursor(null);
    }
+
+   // display this fragment's menu items
+   @Override
+   public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+      super.onCreateOptionsMenu(menu, inflater);
+      inflater.inflate(R.menu.fragment_accounts_menu, menu);
+   }
+
+   // handle menu item selections
+   @Override
+   public boolean onOptionsItemSelected(MenuItem item) {
+      switch (item.getItemId()) {
+         case R.id.action_logout:
+            // clear shared preference data
+            SharedPreferences.Editor editor = sharedpreferences.edit();
+            // clear the logged in user id in shared preferences.
+            editor.putInt(Constants.USER_ID_KEY, 0);
+            editor.clear();
+            editor.apply();
+            // Navigate to LoginActivity
+            Intent intentRegister = new Intent(getContext(), LoginActivity.class);
+            startActivity(intentRegister);
+            return true;
+      }
+
+      return super.onOptionsItemSelected(item);
+   }
+
 }
 
 

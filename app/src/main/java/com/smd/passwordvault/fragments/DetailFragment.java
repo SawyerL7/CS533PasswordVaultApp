@@ -1,11 +1,13 @@
 // DetailFragment.java
-// Fragment subclass that displays one contact's details
+// Fragment subclass that displays one account's details
 package com.smd.passwordvault.fragments;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,7 +25,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.smd.passwordvault.R;
+import com.smd.passwordvault.activities.LoginActivity;
 import com.smd.passwordvault.activities.MainActivity;
+import com.smd.passwordvault.helpers.Constants;
 import com.smd.passwordvault.sql.DatabaseDescription;
 
 public class DetailFragment extends Fragment
@@ -31,16 +35,17 @@ public class DetailFragment extends Fragment
 
    // callback methods implemented by MainActivity
    public interface DetailFragmentListener {
-      void onAccountDeleted(); // called when a contact is deleted
+      void onAccountDeleted(); // called when a account is deleted
 
-      // pass Uri of contact to edit to the DetailFragmentListener
-      void onEditAccount(Uri contactUri);
+      // pass Uri of account to edit to the DetailFragmentListener
+      void onEditAccount(Uri accountUri);
    }
 
+   private SharedPreferences sharedpreferences;
    private static final int ACCOUNT_LOADER = 0; // identifies the Loader
 
    private DetailFragmentListener listener; // MainActivity
-   private Uri contactUri; // Uri of selected contact
+   private Uri accountUri; // Uri of selected account
 
    private TextView nameTextView; // displays Account's name
    private TextView passwordTextView; // displays Account's password
@@ -67,11 +72,14 @@ public class DetailFragment extends Fragment
       super.onCreateView(inflater, container, savedInstanceState);
       setHasOptionsMenu(true); // this fragment has menu items to display
 
-      // get Bundle of arguments then extract the contact's Uri
+      // getting the data which is stored in shared preferences.
+      sharedpreferences = getContext().getSharedPreferences(Constants.SHARED_PREFS, Context.MODE_PRIVATE);
+
+      // get Bundle of arguments then extract the account's Uri
       Bundle arguments = getArguments();
 
       if (arguments != null)
-         contactUri = arguments.getParcelable(MainActivity.ACCOUNT_URI);
+         accountUri = arguments.getParcelable(MainActivity.ACCOUNT_URI);
 
       // inflate DetailFragment's layout
       View view =
@@ -81,7 +89,7 @@ public class DetailFragment extends Fragment
       nameTextView = (TextView) view.findViewById(R.id.nameTextView);
       passwordTextView = (TextView) view.findViewById(R.id.passwordTextView);
 
-      // load the contact
+      // load the account
       getLoaderManager().initLoader(ACCOUNT_LOADER, null, this);
       return view;
    }
@@ -98,23 +106,34 @@ public class DetailFragment extends Fragment
    public boolean onOptionsItemSelected(MenuItem item) {
       switch (item.getItemId()) {
          case R.id.action_edit:
-            listener.onEditAccount(contactUri); // pass Uri to listener
+            listener.onEditAccount(accountUri); // pass Uri to listener
             return true;
          case R.id.action_delete:
-            deleteContact();
+            deleteAccount();
+            return true;
+         case R.id.action_logout:
+            // clear shared preference data
+            SharedPreferences.Editor editor = sharedpreferences.edit();
+            // clear the logged in user id in shared preferences.
+            editor.putInt(Constants.USER_ID_KEY, 0);
+            editor.clear();
+            editor.apply();
+            // Navigate to LoginActivity
+            Intent intentRegister = new Intent(getContext(), LoginActivity.class);
+            startActivity(intentRegister);
             return true;
       }
 
       return super.onOptionsItemSelected(item);
    }
 
-   // delete a contact
-   private void deleteContact() {
+   // delete a account
+   private void deleteAccount() {
       // use FragmentManager to display the confirmDelete DialogFragment
       confirmDelete.show(getFragmentManager(), "confirm delete");
    }
 
-   // DialogFragment to confirm deletion of contact
+   // DialogFragment to confirm deletion of account
    private final DialogFragment confirmDelete =
       new DialogFragment() {
          // create an AlertDialog and return it
@@ -135,9 +154,9 @@ public class DetailFragment extends Fragment
                      DialogInterface dialog, int button) {
 
                      // use Activity's ContentResolver to invoke
-                     // delete on the AddressBookContentProvider
+                     // delete on the AccountDataContentProvider
                      getActivity().getContentResolver().delete(
-                        contactUri, null, null);
+                        accountUri, null, null);
                      listener.onAccountDeleted(); // notify listener
                   }
                }
@@ -158,7 +177,7 @@ public class DetailFragment extends Fragment
       switch (id) {
          case ACCOUNT_LOADER:
             cursorLoader = new CursorLoader(getActivity(),
-               contactUri, // Uri of contact to display
+               accountUri, // Uri of account to display
                null, // null projection returns all columns
                null, // null selection returns all rows
                null, // no selection arguments
@@ -175,7 +194,7 @@ public class DetailFragment extends Fragment
    // called by LoaderManager when loading completes
    @Override
    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-      // if the contact exists in the database, display its data
+      // if the account exists in the database, display its data
       if (data != null && data.moveToFirst()) {
          // get the column index for each data item
          int nameIndex = data.getColumnIndex(DatabaseDescription.AccountData.COLUMN_NAME);

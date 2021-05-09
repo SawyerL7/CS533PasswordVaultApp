@@ -1,5 +1,5 @@
 // ContactsAdapter.java
-// Subclass of RecyclerView.Adapter that binds contacts to RecyclerView
+// Subclass of RecyclerView.Adapter that binds accounts to RecyclerView
 package com.smd.passwordvault.sql;
 
 import android.database.Cursor;
@@ -16,7 +16,7 @@ public class AccountsAdapter
    // interface implemented by AccountsFragment to respond
    // when the user touches an item in the RecyclerView
    public interface AccountClickListener {
-      void onClick(Uri contactUri);
+      void onClick(Uri accountUri);
    }
 
    // nested subclass of RecyclerView.ViewHolder used to implement
@@ -33,16 +33,16 @@ public class AccountsAdapter
          // attach listener to itemView
          itemView.setOnClickListener(
             new View.OnClickListener() {
-               // executes when the contact in this ViewHolder is clicked
+               // executes when the account in this ViewHolder is clicked
                @Override
                public void onClick(View view) {
-                  clickListener.onClick(DatabaseDescription.AccountData.buildContactUri(rowID));
+                  clickListener.onClick(DatabaseDescription.AccountData.buildAccountUri(rowID));
                }
             }
          );
       }
 
-      // set the database row ID for the contact in this ViewHolder
+      // set the database row ID for the account in this ViewHolder
       public void setRowID(long rowID) {
          this.rowID = rowID;
       }

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.smd.passwordvault.model.User;
 
@@ -12,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
+
+    private static final String TAG = "DatabaseHelper";
 
     // Database Version
     private static final int DATABASE_VERSION = 1;
@@ -212,13 +215,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * This method to check user exist or not
+     * This method to check user exist or not and returns the id of the user
+     * if the email and password match
      *
      * @param email
      * @param password
      * @return true/false
      */
-    public boolean checkUser(String email, String password) {
+    public int checkUser(String email, String password) {
+
+        int loggedInUserId = 0;
 
         // array of columns to fetch
         String[] columns = {
@@ -246,13 +252,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 null);                      //The sort order
 
         int cursorCount = cursor.getCount();
+        Log.v(TAG,"+++++++++ ******** cursorCount:" + cursorCount);
+        if(cursorCount == 1){
+            cursor.moveToNext();
+            String strUserId = cursor.getString(cursor.getColumnIndex(COLUMN_USER_ID));
+            Log.v(TAG,"********* strUserId:" + strUserId);
+            loggedInUserId = Integer.parseInt(strUserId);
+            Log.v(TAG,"********* userId:" + loggedInUserId);
+        }
 
         cursor.close();
         db.close();
-        if (cursorCount > 0) {
-            return true;
-        }
-
-        return false;
+        return loggedInUserId;
     }
 }

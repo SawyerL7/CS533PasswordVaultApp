@@ -15,4 +15,11 @@
       android:orderInCategory="2"
       android:title="@string/menuitem_delete"
       app:showAsAction="always"/>
+
+   <item
+       android:id="@+id/action_logout"
+       android:icon="@drawable/ic_logout_24dp"
+       android:orderInCategory="3"
+       android:title="@string/menuitem_logout"
+       app:showAsAction="always"/>
 </menu>

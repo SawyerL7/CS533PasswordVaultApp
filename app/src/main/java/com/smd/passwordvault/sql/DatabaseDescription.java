@@ -20,7 +20,7 @@ public class DatabaseDescription {
    public static final class AccountData implements BaseColumns {
       public static final String TABLE_NAME = "AccountData"; // table's name
 
-      // Uri for the contacts table
+      // Uri for the accounts table
       public static final Uri CONTENT_URI =
          BASE_CONTENT_URI.buildUpon().appendPath(TABLE_NAME).build();
 
@@ -37,8 +37,8 @@ public class DatabaseDescription {
                       COLUMN_NAME + " TEXT, " +
                       COLUMN_PASSWORD + " TEXT);";
 
-      // creates a Uri for a specific contact
-      public static Uri buildContactUri(long id) {
+      // creates a Uri for a specific account
+      public static Uri buildAccountUri(long id) {
          return ContentUris.withAppendedId(CONTENT_URI, id);
       }
    }
