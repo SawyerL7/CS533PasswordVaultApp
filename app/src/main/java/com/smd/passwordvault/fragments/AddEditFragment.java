@@ -5,7 +5,6 @@ package com.smd.passwordvault.fragments;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
@@ -16,27 +15,21 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.AppCompatTextView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
-import android.widget.TextView;
-
 
 import com.smd.passwordvault.R;
 import com.smd.passwordvault.activities.MainActivity;
 import com.smd.passwordvault.sql.DatabaseDescription;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class AddEditFragment extends Fragment
-   implements LoaderManager.LoaderCallbacks<Cursor> {
+   implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener  {
 
    // defines callback method implemented by MainActivity
    public interface AddEditFragmentListener {
@@ -51,10 +44,13 @@ public class AddEditFragment extends Fragment
    private Uri accountUri; // Uri of selected account
    private boolean addingNewAccount = true; // adding (true) or editing
 
-   // EditTexts for recipe information
+   // EditTexts for account information
    private TextInputLayout nameTextInputLayout;
    private TextInputLayout passwordTextInputLayout;
+   private TextInputLayout suggestPasswordTextInputLayout;
    private FloatingActionButton saveAccountFAB;
+
+   private AppCompatTextView textViewLinkSuggestPassword;
 
    private CoordinatorLayout coordinatorLayout; // used with SnackBars
 
@@ -90,6 +86,13 @@ public class AddEditFragment extends Fragment
 
       passwordTextInputLayout =
          (TextInputLayout) view.findViewById(R.id.passwordTextInputLayout);
+
+      suggestPasswordTextInputLayout =
+              (TextInputLayout) view.findViewById(R.id.suggestPasswordTextInputLayout);
+
+      textViewLinkSuggestPassword = (AppCompatTextView) view.findViewById(R.id.textViewLinkSuggestPassword);
+
+      textViewLinkSuggestPassword.setOnClickListener(this);
 
       // set FloatingActionButton's event listener
       saveAccountFAB = (FloatingActionButton) view.findViewById(
@@ -242,6 +245,22 @@ public class AddEditFragment extends Fragment
    // called by LoaderManager when the Loader is being reset
    @Override
    public void onLoaderReset(Loader<Cursor> loader) { }
+
+
+   /**
+    * This implemented method is to listen the click on view
+    *
+    * @param v
+    */
+   @Override
+   public void onClick(View v) {
+      switch (v.getId()) {
+         case R.id.textViewLinkSuggestPassword:
+           // TODO: Bryce to update this to get the value from the WEB service call
+            suggestPasswordTextInputLayout.getEditText().setText("TODO: update this with the result from API");
+            break;
+      }
+   }
 }
 
 

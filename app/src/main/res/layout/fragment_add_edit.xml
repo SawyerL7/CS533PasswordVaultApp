@@ -43,6 +43,29 @@
                android:textColor="@android:color/white"/>
          </android.support.design.widget.TextInputLayout>
 
+         <android.support.design.widget.TextInputLayout
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:id="@+id/suggestPasswordTextInputLayout">
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/editText4"
+                android:hint="@string/hint_suggest_password"
+                android:imeOptions="actionNext"
+                android:inputType="textMultiLine"
+                android:textColor="@android:color/white"/>
+         </android.support.design.widget.TextInputLayout>
+
+         <android.support.v7.widget.AppCompatTextView
+             android:id="@+id/textViewLinkSuggestPassword"
+             android:layout_width="fill_parent"
+             android:layout_height="wrap_content"
+             android:layout_marginTop="10dp"
+             android:gravity="left"
+             android:text="@string/text_generate_password"
+             android:textSize="16dp" />
 
       </LinearLayout>
    </ScrollView>
