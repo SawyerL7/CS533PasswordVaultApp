@@ -106,6 +106,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         switch (v.getId()) {
 
             case R.id.appCompatButtonRegister:
+                isDataFilled(v);
                 postDataToSQLite();
                 break;
 
@@ -173,5 +174,14 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         textInputEditTextEmail.setText(null);
         textInputEditTextPassword.setText(null);
         textInputEditTextConfirmPassword.setText(null);
+    }
+    //This is a checker to see if the fields are all filled, to then hide keyboard
+    private void isDataFilled(View v) {
+        if (textInputEditTextName.isDirty() & textInputEditTextEmail.isDirty() & textInputEditTextPassword.isDirty() & textInputEditTextConfirmPassword.isDirty())
+        {
+            inputValidation.hideKeyboardFrom(v);
+        }
+
+
     }
 }
