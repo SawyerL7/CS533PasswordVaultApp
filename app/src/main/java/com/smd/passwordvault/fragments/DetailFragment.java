@@ -16,6 +16,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,10 +29,13 @@ import com.smd.passwordvault.R;
 import com.smd.passwordvault.activities.LoginActivity;
 import com.smd.passwordvault.activities.MainActivity;
 import com.smd.passwordvault.helpers.Constants;
+import com.smd.passwordvault.helpers.EncryptionUtil;
 import com.smd.passwordvault.sql.DatabaseDescription;
 
 public class DetailFragment extends Fragment
    implements LoaderManager.LoaderCallbacks<Cursor> {
+
+   private static final String TAG = "DetailFragment";
 
    // callback methods implemented by MainActivity
    public interface DetailFragmentListener {
@@ -202,7 +206,17 @@ public class DetailFragment extends Fragment
 
          // fill TextViews with the retrieved data
          nameTextView.setText(data.getString(nameIndex));
-         passwordTextView.setText(data.getString(passwordIndex));
+
+         // decrypt the password to show it in plain text to the user
+         String encPwd = data.getString(passwordIndex);
+         String plainPwd = encPwd;
+         try{
+            plainPwd = EncryptionUtil.decryptPassword(encPwd);
+         }
+         catch (Exception ex){
+            Log.e(TAG,"Error while decrypting the password for:" + nameTextView.getText());
+         }
+         passwordTextView.setText(plainPwd);
       }
    }
 

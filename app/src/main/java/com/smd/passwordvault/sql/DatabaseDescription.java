@@ -18,7 +18,7 @@ public class DatabaseDescription {
 
    // nested class defines contents of the Account/SiteData table
    public static final class AccountData implements BaseColumns {
-      public static final String TABLE_NAME = "AccountData"; // table's name
+      public static final String TABLE_NAME = "PV_ACCOUNT"; // table's name
 
       // Uri for the accounts table
       public static final Uri CONTENT_URI =

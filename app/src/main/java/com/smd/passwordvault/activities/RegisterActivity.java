@@ -9,9 +9,11 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatTextView;
+import android.util.Log;
 import android.view.View;
 
 import com.smd.passwordvault.R;
+import com.smd.passwordvault.helpers.EncryptionUtil;
 import com.smd.passwordvault.helpers.InputValidation;
 import com.smd.passwordvault.model.User;
 import com.smd.passwordvault.sql.DatabaseHelper;
@@ -20,6 +22,7 @@ import com.smd.passwordvault.sql.DatabaseHelper;
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
 
     private final AppCompatActivity activity = RegisterActivity.this;
+    private static final String TAG = "RegisterActivity";
 
     private NestedScrollView nestedScrollView;
 
@@ -137,7 +140,15 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
             user.setName(textInputEditTextName.getText().toString().trim());
             user.setEmail(textInputEditTextEmail.getText().toString().trim());
-            user.setPassword(textInputEditTextPassword.getText().toString().trim());
+            String origPwd = textInputEditTextPassword.getText().toString().trim();
+            String encPwd = origPwd;
+            try{
+                encPwd = EncryptionUtil.createPasswordHash(origPwd);
+            }
+            catch (Exception ex){
+                Log.e(TAG,"Error while calculating a oneway hash of the password for:" + user.getEmail());
+            }
+            user.setPassword(encPwd);
 
             databaseHelper.addUser(user);
 

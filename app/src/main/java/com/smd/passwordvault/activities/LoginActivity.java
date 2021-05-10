@@ -16,6 +16,7 @@ import android.view.View;
 
 import com.smd.passwordvault.R;
 import com.smd.passwordvault.helpers.Constants;
+import com.smd.passwordvault.helpers.EncryptionUtil;
 import com.smd.passwordvault.helpers.InputValidation;
 import com.smd.passwordvault.sql.DatabaseHelper;
 
@@ -125,8 +126,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
 
         Log.v(TAG, "++++ 1 +++++++");
+        String origPwd = textInputEditTextPassword.getText().toString().trim();
+        String encPwd = origPwd;
+        try{
+            encPwd = EncryptionUtil.createPasswordHash(origPwd);
+        }
+        catch (Exception ex){
+            Log.e(TAG,"Error while calculating a oneway hash of the password for:" +
+                    textInputEditTextEmail.getText().toString().trim());
+        }
         int loggedInUserId = databaseHelper.checkUser(textInputEditTextEmail.getText().toString().trim()
-                , textInputEditTextPassword.getText().toString().trim());
+                , encPwd);
         Log.v(TAG, "++++ Logged In UserId:" + loggedInUserId);
         if (loggedInUserId > 0) {
             Intent accountsIntent = new Intent(activity, MainActivity.class); // TODO: change this

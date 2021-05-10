@@ -18,6 +18,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.AppCompatTextView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,11 +26,14 @@ import android.view.inputmethod.InputMethodManager;
 
 import com.smd.passwordvault.R;
 import com.smd.passwordvault.activities.MainActivity;
+import com.smd.passwordvault.helpers.EncryptionUtil;
 import com.smd.passwordvault.sql.DatabaseDescription;
 
 
 public class AddEditFragment extends Fragment
    implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener  {
+
+   private static final String TAG = "AddEditFragment";
 
    // defines callback method implemented by MainActivity
    public interface AddEditFragmentListener {
@@ -167,8 +171,17 @@ public class AddEditFragment extends Fragment
       ContentValues contentValues = new ContentValues();
       contentValues.put(DatabaseDescription.AccountData.COLUMN_NAME,
          nameTextInputLayout.getEditText().getText().toString());
-      contentValues.put(DatabaseDescription.AccountData.COLUMN_PASSWORD,
-              passwordTextInputLayout.getEditText().getText().toString());
+
+      // encrypt the password before saving it to the database
+      String origPwd =passwordTextInputLayout.getEditText().getText().toString();
+      String encPwd = origPwd;
+      try{
+         encPwd = EncryptionUtil.encryptPassword(origPwd);
+      }
+      catch (Exception ex){
+         Log.e(TAG,"Error while encrypting password for:" + nameTextInputLayout.getEditText().getText().toString());
+      }
+      contentValues.put(DatabaseDescription.AccountData.COLUMN_PASSWORD, encPwd);
 
       if (addingNewAccount) {
          // use Activity's ContentResolver to invoke
@@ -235,8 +248,17 @@ public class AddEditFragment extends Fragment
          nameTextInputLayout.getEditText().setText(
             data.getString(nameIndex));
 
-         passwordTextInputLayout.getEditText().setText(
-            data.getString(passwordIndex));
+         // decrypt the password to show it in plain text to the user
+         String encPwd = data.getString(passwordIndex);
+         String plainPwd = encPwd;
+         try{
+            plainPwd = EncryptionUtil.decryptPassword(encPwd);
+         }
+         catch (Exception ex){
+            Log.e(TAG,"Error while decrypting the password for:" + nameTextInputLayout.getEditText().getText());
+         }
+
+         passwordTextInputLayout.getEditText().setText(plainPwd);
 
          updateSaveButtonFAB();
       }
@@ -257,7 +279,7 @@ public class AddEditFragment extends Fragment
       switch (v.getId()) {
          case R.id.textViewLinkSuggestPassword:
            // TODO: Bryce to update this to get the value from the WEB service call
-            suggestPasswordTextInputLayout.getEditText().setText("TODO: update this with the result from API");
+            suggestPasswordTextInputLayout.getEditText().setText(EncryptionUtil.generateRandomPassword(10));
             break;
       }
    }
