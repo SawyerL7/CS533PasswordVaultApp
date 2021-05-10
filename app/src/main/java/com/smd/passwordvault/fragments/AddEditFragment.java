@@ -245,38 +245,9 @@ public class AddEditFragment extends Fragment
    // called by LoaderManager when the Loader is being reset
    @Override
    public void onClick(View v) {
-
-      String apiURL = "https://randommer.io/api/Text/Password?length=12&hasDigits=true&hasUppercase=true&hasSpecial=true";
-      String apiKey = "34d00eae19e04f6eb2123cdf2a59e1e1";
-      String result = "";
-
       switch (v.getId()) {
          case R.id.textViewLinkSuggestPassword:
-            try {
-               URL url = new URL(apiURL);
-               HttpURLConnection con = (HttpURLConnection) url.openConnection();
-               con.setRequestMethod("GET");
-               con.setRequestProperty("X-Api-Key", apiKey);
-               con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36");
-               int response = con.getResponseCode();
-
-               if (response == 200) {
-                  InputStream is = con.getInputStream();
-                  Scanner s = new Scanner(is);
-                  result = s.hasNext() ? s.next() : "";
-               } 
-               else {
-                  throw new RuntimeException("HttpResponseCode: " + response);
-               }
-            } catch (ProtocolException e) {
-               e.printStackTrace();
-            } catch (MalformedURLException e) {
-               e.printStackTrace();
-            } catch (IOException e) {
-               e.printStackTrace();
-            }
-
-            suggestPasswordTextInputLayout.getEditText().setText(result);
+            suggestPasswordTextInputLayout.getEditText().setText("Call here");
             break;
       }
    }
