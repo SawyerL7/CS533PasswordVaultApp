@@ -27,6 +27,7 @@ import android.view.inputmethod.InputMethodManager;
 import com.smd.passwordvault.R;
 import com.smd.passwordvault.activities.MainActivity;
 import com.smd.passwordvault.helpers.EncryptionUtil;
+import com.smd.passwordvault.helpers.GeneratePassword;
 import com.smd.passwordvault.sql.DatabaseDescription;
 
 
@@ -278,7 +279,7 @@ public class AddEditFragment extends Fragment
    public void onClick(View v) {
       switch (v.getId()) {
          case R.id.textViewLinkSuggestPassword:
-           // TODO: Bryce to update this to get the value from the WEB service call
+            //suggestPasswordTextInputLayout.getEditText().setText(GeneratePassword.newPassword());
             suggestPasswordTextInputLayout.getEditText().setText(EncryptionUtil.generateRandomPassword(10));
             break;
       }
