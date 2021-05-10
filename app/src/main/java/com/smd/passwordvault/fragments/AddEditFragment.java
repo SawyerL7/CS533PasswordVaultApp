@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -29,6 +30,11 @@ import com.smd.passwordvault.activities.MainActivity;
 import com.smd.passwordvault.helpers.EncryptionUtil;
 import com.smd.passwordvault.helpers.GeneratePassword;
 import com.smd.passwordvault.sql.DatabaseDescription;
+
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Scanner;
 
 
 public class AddEditFragment extends Fragment
@@ -280,10 +286,77 @@ public class AddEditFragment extends Fragment
       switch (v.getId()) {
          case R.id.textViewLinkSuggestPassword:
             //suggestPasswordTextInputLayout.getEditText().setText(GeneratePassword.newPassword());
-            suggestPasswordTextInputLayout.getEditText().setText(EncryptionUtil.generateRandomPassword(10));
+            //suggestPasswordTextInputLayout.getEditText().setText(EncryptionUtil.generateRandomPassword(10));
+            URL url = createURL();
+            if (url != null) {
+               GetRandomPasswordTask getRandomPasswordTask = new GetRandomPasswordTask();
+               getRandomPasswordTask.execute(url);
+            }
+            else {
+//               Snackbar.make(findViewById(R.id.coordinatorLayout),
+//                       R.string.invalid_url, Snackbar.LENGTH_LONG).show();
+            }
+
             break;
       }
    }
+
+   private URL createURL() {
+      String apiURL = "https://randommer.io/api/Text/Password?length=12&hasDigits=true&hasUppercase=true&hasSpecial=true";
+
+      try {
+         return new URL(apiURL);
+      }
+      catch (Exception e) {
+         Log.e(TAG, "~Error while creating the URL");
+      }
+      return null; // URL was malformed
+   }
+
+
+   // makes the REST web service call to get weather data and
+   // saves the data to a local HTML file
+   private class GetRandomPasswordTask
+           extends AsyncTask<URL, Void, String> {
+
+      @Override
+      protected String doInBackground(URL... params) {
+         String apiKey = "34d00eae19e04f6eb2123cdf2a59e1e1";
+         String pwd = "<ERROR>";
+         HttpURLConnection con = null;
+         try {
+            con = (HttpURLConnection) params[0].openConnection();
+            con.setRequestMethod("GET");
+            con.setRequestProperty("X-Api-Key", apiKey);
+            con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36");
+            int response = con.getResponseCode();
+            if (response == 200) {
+               InputStream is = con.getInputStream();
+               Scanner s = new Scanner(is);
+               pwd = s.hasNext() ? s.next() : "";
+            }
+            else {
+               // throw new RuntimeException("HttpResponseCode: " + response);
+            }
+         }
+         catch (Exception ex){
+            Log.e(TAG, "~Error while getting the connection and random password using REST API");
+         }
+         finally {
+            if(con != null){
+               con.disconnect(); // close the HttpURLConnection
+            }
+         }
+         return pwd;
+      }
+
+      // process JSON response and update ListView
+      @Override
+      protected void onPostExecute(String randomPassword) {
+         suggestPasswordTextInputLayout.getEditText().setText(randomPassword);
+      }
+   }
+
 }
 
 
